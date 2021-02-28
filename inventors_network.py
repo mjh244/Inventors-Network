@@ -13,6 +13,12 @@ Original file is located at
 import csv
 import pandas as pd
 import numpy as np
+from linkedin_scraper import Person, actions
+from selenium import webdriver
+
+######################################
+# Data Manipulation
+######################################
 
 # Reads in the dataset to a dataframe
 df = pd.read_csv('invpat\invpat.csv')
@@ -23,4 +29,15 @@ df = df.dropna()
 
 # Saves the filtered inventor dataframe as csv
 df.to_csv('inventor-patent.csv') 
+
 print(df)
+
+#####################################
+# Inventor Data Retrieval
+#####################################
+
+# This should log us into our account and get us our info (havn't tested yet).
+email = "st3407126@protonmail.com"
+password = "csdsgroup7"
+actions.login(driver, email, password) 
+person = Person("https://www.linkedin.com/in/student-testaccount-4742b9208", driver=driver)
