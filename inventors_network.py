@@ -38,6 +38,6 @@ print(df)
 
 # This should log us into our account and get us our info (havn't tested yet).
 email = "st3407126@protonmail.com"
-password = "csdsgroup7"
+password = "csds395group7"
 actions.login(driver, email, password) 
 person = Person("https://www.linkedin.com/in/student-testaccount-4742b9208", driver=driver)
