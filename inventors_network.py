@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 from linkedin_scraper import Person, actions
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 ######################################
 # Data Manipulation
@@ -36,8 +37,15 @@ print(df)
 # Inventor Data Retrieval
 #####################################
 
+driver = webdriver.Chrome(ChromeDriverManager().install())
+
 # This should log us into our account and get us our info (havn't tested yet).
 email = "st3407126@protonmail.com"
 password = "csds395group7"
+# Logs into our account
 actions.login(driver, email, password) 
-person = Person("https://www.linkedin.com/in/student-testaccount-4742b9208", driver=driver)
+# Creates a person object
+person1 = Person("https://www.linkedin.com/in/student-test-account-4742b9208/", driver=driver)
+# Scrapes data from the person, not sure what, seems like education and connections
+person1.scrape()
+print(person1)
