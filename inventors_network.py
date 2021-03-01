@@ -37,15 +37,4 @@ print(df)
 # Inventor Data Retrieval
 #####################################
 
-driver = webdriver.Chrome(ChromeDriverManager().install())
-
-# This should log us into our account and get us our info (havn't tested yet).
-email = "st3407126@protonmail.com"
-password = "csds395group7"
-# Logs into our account
-actions.login(driver, email, password) 
-# Creates a person object
-person1 = Person("https://www.linkedin.com/in/student-test-account-4742b9208/", driver=driver)
-# Scrapes data from the person, not sure what, seems like education and connections
-person1.scrape()
-print(person1)
+#driver = webdriver.Chrome(ChromeDriverManager().install())
