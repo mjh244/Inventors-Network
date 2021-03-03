@@ -13,9 +13,7 @@ Original file is located at
 import csv
 import pandas as pd
 import numpy as np
-from linkedin_scraper import Person, actions
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
+from linkedin import linkedin
 
 ######################################
 # Data Manipulation
@@ -37,4 +35,3 @@ print(df)
 # Inventor Data Retrieval
 #####################################
 
-#driver = webdriver.Chrome(ChromeDriverManager().install())
