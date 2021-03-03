@@ -25,7 +25,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 df = pd.read_csv('invpat\invpat.csv')
 
 # Removes unecessary field (WE MAY HAVE TO CHANGE IT TO OTHER FIELDS WE WANT TO REMOVE)
-df = df.drop(['Street', 'City', 'State', 'Country', 'Zipcode', 'Lat', 'Lng', 'Class', 'Invnum_N_UC', 'Density', 'Precision', 'Recall'], axis = 1)
+df = df.drop(['Street', 'Lat', 'Lng', 'InvSeq', 'AsgNum', 'Class', 'Invnum', 'Invnum_N', 'Invnum_N_UC', 'Density', 'Precision', 'Recall'], axis = 1)
 df = df.dropna()
 
 # Saves the filtered inventor dataframe as csv
