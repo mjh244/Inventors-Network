@@ -118,3 +118,7 @@ df['Eigenvector'] = eigenvectorPerCompany
 df = df.dropna()
 print(df)
 df.to_csv('inventor-patent-ten-thousand-nodes.csv')
+
+#####################################
+# Stock Market Data Retrieval
+#####################################
