@@ -4,6 +4,7 @@
 import csv
 import pandas as pd
 import numpy as np
+import igraph
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -28,7 +29,6 @@ print(df)
 
 # Creates the graphs
 inventorNetwork = nx.Graph()
-inventorNetworkSubset = nx.Graph()
 
 # Gets values from the graph and puts them in their respective lists
 firstNames = df["Firstname"].values
@@ -39,13 +39,14 @@ for i in range(len(firstNames)):
 patents = df["Patent"].values
 companies = df["Assignee"].values
 
-# Adds nodes and edges to the graph for the entire dataset
-for i in range(len(companies)):
+# Sets node limit for network and adds nodes and edges to the graph
+nodeLimit = 10000
+for i in range(nodeLimit):
 
     # Adds nodes to the network if they weren't already in the network
     if (companies[i] not in inventorNetwork.nodes):
         inventorNetwork.add_node(companies[i], company = companies[i])
-    if (patents[i] not in inventorNetwork):
+    if (patents[i] not in inventorNetwork.nodes):
         inventorNetwork.add_node(patents[i], patent = patents[i])
     if (inventors[i] not in inventorNetwork.nodes):
         inventorNetwork.add_node(inventors[i], inventor = inventors[i])
@@ -56,85 +57,64 @@ for i in range(len(companies)):
     if (patents[i], inventors[i]) not in inventorNetwork.edges:
         inventorNetwork.add_edge(patents[i], inventors[i])
 
-# Adds nodes and edges to the graph for a subset of the dataset
-for i in range(100):
-    
-    # Adds nodes to the network if they weren't already in the network
-    if (companies[i] not in inventorNetworkSubset.nodes):
-        inventorNetworkSubset.add_node(companies[i], company = companies[i], type = 'company')
-    if (patents[i] not in inventorNetworkSubset):
-        inventorNetworkSubset.add_node(patents[i], patent = patents[i], type = 'patent')
-    if (inventors[i] not in inventorNetworkSubset.nodes):
-        inventorNetworkSubset.add_node(inventors[i], inventor = inventors[i], type = 'inventor')
 
-    # Adds edges to the network
-    if (companies[i], patents[i]) not in inventorNetworkSubset.edges:
-        inventorNetworkSubset.add_edge(companies[i], patents[i])
-    if (patents[i], inventors[i]) not in inventorNetworkSubset.edges:
-        inventorNetworkSubset.add_edge(patents[i], inventors[i])
+# Gathers company names to gather nodes
+allNodesByCompany = inventorNetwork.nodes(data = True)
+allNodesByCompany2 = list(inventorNetwork.nodes)
+nodeNames = []
+
+#Sets node limit for subset network
+nodeSubsetLimit = 100
+for i in range(nodeSubsetLimit):
+    nodeNames.append(allNodesByCompany2[i])
+
+# Creates subgraph of 
+inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
 
 # Displays the subset graph
 nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=100)
 plt.title("Inventors Network (Subset)")
 plt.show()
 
-
 #####################################
 # Metrics Calculation
 #####################################
 
-# Documentation on calculating metrics
-# https://networkx.org/documentation/stable/reference/algorithms/centrality.html
-
-# Documentation on getting nodes by their type/name
-# https://networkx.org/documentation/networkx-2.1/reference/classes/generated/networkx.Graph.nodes.html
-
-# Computes metrics for all nodes 
-# (REMEMBER TO CHANGE BACK TO NORMAL, JUST USING SUBSET TO PRINT AND TEST)
-# THIS IS THE EASIEST WAY BUT IDK HOW TO FILTER OUT COMPANIES ONLY FROM THIS
-
+# Computes metrics for nodes 
 degree = nx.degree_centrality(inventorNetwork) 
+print("degree calculated")
 closeness = nx.closeness_centrality(inventorNetwork) 
-betweeness = nx.betweenness_centrality(inventorNetwork, normalized = True, endpoints = False) 
+print("closeness calculated")
+#betweenness = nx.betweenness_centrality(inventorNetwork, normalized = True, endpoints = False) 
+#print("betweenness calculated")
 eigenvector = nx.eigenvector_centrality(inventorNetwork) 
-"""
-degree = nx.degree_centrality(inventorNetworkSubset) 
-closeness = nx.closeness_centrality(inventorNetworkSubset) 
-betweeness = nx.betweenness_centrality(inventorNetworkSubset, normalized = True, endpoints = False) 
-eigenvector = nx.eigenvector_centrality(inventorNetworkSubset) 
-"""
-"""
-print("---------------------Degree ------------------------------------")
-print(degree)
-print("---------------------Closeness ------------------------------------")
-print(closeness)
-print("---------------------Betweeness ------------------------------------")
-print(betweeness)
-print("---------------------Eigenvector ------------------------------------")
-print(eigenvector)
-"""
+print("eigenvector calculated")
 
+# Lists to hold company centrality metrics
 degreePerCompany = []
 closenessPerCompany = []
-betweenessPerCompany = []
+#betweennessPerCompany = []
 eigenvectorPerCompany = []
 
 # Gets the metrics based on company key and stores them in order of company to merge with df
-for i in range(len(companies)):
-#for i in range(100):
+for i in range(len(degree)):
     degreePerCompany.append(degree.get(companies[i]))
     closenessPerCompany.append(closeness.get(companies[i]))
-    betweenessPerCompany.append(betweeness.get(companies[i]))
+    #betweennessPerCompany.append(betweenness.get(companies[i]))
     eigenvectorPerCompany.append(eigenvector.get(companies[i]))
 
-#print(degreePerCompany)
+print("Finished computing lists \n")
+
+# Limits df to number of companies centrality was calculated for
+df = df.head(len(degree))
 
 # Adds the metrics to the dataframe
 df['Degree'] = degreePerCompany
 df['Closeness'] = closenessPerCompany
-df['Betweeness'] = betweenessPerCompany
+#df['Betweeness'] = betweennessPerCompany
 df['Eigenvector'] = eigenvectorPerCompany
 
-print(len(companies))
-print(len(degreePerCompany))
+# Drops rows with empty fields and saves the df
+df = df.dropna()
 print(df)
+df.to_csv('inventor-patent-ten-thousand-nodes.csv')
