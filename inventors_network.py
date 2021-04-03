@@ -7,6 +7,7 @@ import numpy as np
 import igraph
 import networkx as nx
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 ######################################
 # Data Manipulation
@@ -22,6 +23,7 @@ df = df.dropna()
 # Saves the filtered inventor dataframe as csv
 df.to_csv('inventor-patent.csv')
 print(df)
+fulldf = df.copy()
 
 #####################################
 # Network Creation
@@ -85,22 +87,22 @@ degree = nx.degree_centrality(inventorNetwork)
 print("degree calculated")
 closeness = nx.closeness_centrality(inventorNetwork) 
 print("closeness calculated")
-#betweenness = nx.betweenness_centrality(inventorNetwork, normalized = True, endpoints = False) 
-#print("betweenness calculated")
+betweenness = nx.betweenness_centrality(inventorNetwork, 25, normalized = True, endpoints = False) 
+print("betweenness calculated")
 eigenvector = nx.eigenvector_centrality(inventorNetwork) 
 print("eigenvector calculated")
 
 # Lists to hold company centrality metrics
 degreePerCompany = []
 closenessPerCompany = []
-#betweennessPerCompany = []
+betweennessPerCompany = []
 eigenvectorPerCompany = []
 
 # Gets the metrics based on company key and stores them in order of company to merge with df
 for i in range(len(degree)):
     degreePerCompany.append(degree.get(companies[i]))
     closenessPerCompany.append(closeness.get(companies[i]))
-    #betweennessPerCompany.append(betweenness.get(companies[i]))
+    betweennessPerCompany.append(betweenness.get(companies[i]))
     eigenvectorPerCompany.append(eigenvector.get(companies[i]))
 
 print("Finished computing lists \n")
@@ -111,7 +113,7 @@ df = df.head(len(degree))
 # Adds the metrics to the dataframe
 df['Degree'] = degreePerCompany
 df['Closeness'] = closenessPerCompany
-#df['Betweeness'] = betweennessPerCompany
+df['Betweeness'] = betweennessPerCompany
 df['Eigenvector'] = eigenvectorPerCompany
 
 # Drops rows with empty fields and saves the df
@@ -122,3 +124,54 @@ df.to_csv('inventor-patent-ten-thousand-nodes.csv')
 #####################################
 # Stock Market Data Retrieval
 #####################################
+
+# Obtained csv of tickers and company names from the following link
+# https://www.quandl.com/data/EOD-End-of-Day-US-Stock-Prices/documentation
+
+# Useful Links
+# https://www.quandl.com/data/EOD-End-of-Day-US-Stock-Prices/documentation
+# https://stackoverflow.com/questions/32383585/turn-list-of-company-names-into-tickers
+# https://www.nasdaq.com/market-activity/stocks/screener
+# https://stackoverflow.com/questions/38967533/retrieve-company-name-with-ticker-symbol-input-yahoo-or-google-api
+# 
+# Reads in the stock ticker and name dataset to a dataframe
+stocksDF = pd.read_csv('invpat/ticker_list.csv')
+
+# Prints the dataframe containing various stock names and tickers
+print(stocksDF)
+
+companyTickers = []
+
+companyNames = df["Assignee"].tolist()
+#companyNames = fulldf["Assignee"].tolist()
+stockNames = stocksDF["Name"].tolist()
+tickers = stocksDF["Ticker"].tolist()
+
+
+for i in range(len(companyNames)):
+    companyNames[i] = companyNames[i].split()[0]
+
+for i in range(len(stockNames)):
+    stockNames[i] = stockNames[i].split()[0]
+
+# Gets the tickers of the companies from the new stocksDF
+for i in range(len(df)):
+    for j in range(len(stockNames)):
+        # Checks if first word of assignee is equal to first word of stock name
+        # Then adds the ticker to the list
+        if (companyNames[i] == stockNames[j]):
+            companyTickers.append(tickers[j])
+            break
+    # If nothing was added, add a None. This way when we merge the tickets with the df,
+    # we can take out rows that don't correspond to a ticket.
+    if (len(companyTickers) != i):
+        companyTickers.append(None)
+
+# Makes df only as long as tickers list
+df = df.head(len(companyTickers))
+df['Tickers'] = companyTickers
+
+# Drops rows where tickers couldn't be matched
+df = df.replace(to_replace='None', value=np.nan).dropna()
+print(df)
+
