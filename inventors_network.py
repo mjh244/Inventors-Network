@@ -3,9 +3,11 @@
 
 # Imports
 import pandas as pd
+import datetime
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import yfinance as yf
 
 
 
@@ -90,6 +92,65 @@ print("THIS IS TICKERS")
 print(tickers)
 #this should have no NAN's in the ticker column
 print("THIS IS DF")
+print(df)
+
+ticker_list = df['Tickers'].to_numpy()
+print("tickers follow")
+print(ticker_list)
+#trying to get histories for the tickers
+hist_list=[]
+for i in ticker_list:
+    stock = yf.Ticker(i)
+    hist = stock.history(period="max")
+    hist_list.append(hist)
+print("this is history of only the first ticker")
+an_history = hist_list[0]
+print(an_history)
+print(an_history.keys())
+
+print("historical info is of type" + str(type(hist_list[0])))
+
+
+
+print("this is dataframe")
+print(df)
+closing_price_prior=[]
+closing_price_current=[]
+closing_price_next=[]
+
+dates_list = df['AppDate'].to_numpy()
+
+for i in range(len(dates_list)):
+    history = hist_list[i]
+    curr_date = dates_list[i]
+    #convert date to the correct format so we can match to find closing price, the problem is that
+    #date formats arent consistent within dates_list
+    if "/" in curr_date:
+        d = datetime.datetime.strptime(curr_date, "%m/%d/%Y")
+        curr_date = datetime.date.strftime(d, '%Y-%m-%d')
+        curr_year = int(curr_date[:4])
+        next_year = str(curr_year + 1)
+        last_year = str(curr_year - 1)
+        curr_year = str(curr_year)
+        prev_date = curr_date.replace(curr_year, last_year)
+        next_date = curr_date.replace(curr_year, next_year)
+        if curr_date in history.index:
+            closing_price_current.append(history.at[curr_date, 'Close'])
+        if next_date in history.index:
+            closing_price_next.append(history.at[next_date, 'Close'])
+        if prev_date in history.index:
+            closing_price_prior.append(history.at[prev_date, 'Close'])
+#padding missing values with zeros
+while len(closing_price_current) < len(dates_list):
+    closing_price_current.append(0)
+while len(closing_price_next) < len(dates_list):
+    closing_price_next.append(0)
+while len(closing_price_prior) < len(dates_list):
+    closing_price_prior.append(0)
+df['Closing Price'] = closing_price_current
+df['Closing Price Last Year'] = closing_price_prior
+df['Closing Price Next Year'] = closing_price_next
+print("this is df")
 print(df)
 
 
