@@ -129,11 +129,26 @@ for i in range(len(dates_list)):
         d = datetime.datetime.strptime(curr_date, "%m/%d/%Y")
         curr_date = datetime.date.strftime(d, '%Y-%m-%d')
         curr_year = int(curr_date[:4])
-        next_year = str(curr_year + 1)
-        last_year = str(curr_year - 1)
+        curr_month = int(curr_date[5:7])
+        #processing to get dates one month before and after patent
+        if curr_month < 12:
+            next_month = str(curr_month + 1)
+            next_year = str(curr_year)
+        else:
+            next_month = str(1)
+            next_year = str(curr_year + 1)
+        if curr_month > 1:
+            prev_month = str(curr_month - 1)
+            prev_year = str(curr_year)
+        else:
+            prev_month = str(12)
+            prev_year = str(curr_year - 1)
+        curr_month = str(curr_month)
         curr_year = str(curr_year)
-        prev_date = curr_date.replace(curr_year, last_year)
-        next_date = curr_date.replace(curr_year, next_year)
+        prev_date = curr_date.replace(curr_month, prev_month)
+        prev_date = prev_date.replace(curr_year, prev_year)
+        next_date = curr_date.replace(curr_month, next_month)
+        next_date = next_date.replace(curr_year, next_year)
         if curr_date in history.index:
             closing_price_current.append(history.at[curr_date, 'Close'])
         if next_date in history.index:
@@ -148,8 +163,8 @@ while len(closing_price_next) < len(dates_list):
 while len(closing_price_prior) < len(dates_list):
     closing_price_prior.append(0)
 df['Closing Price'] = closing_price_current
-df['Closing Price Last Year'] = closing_price_prior
-df['Closing Price Next Year'] = closing_price_next
+df['Closing Price Last Month'] = closing_price_prior
+df['Closing Price Next Month'] = closing_price_next
 print("this is df")
 print(df)
 
