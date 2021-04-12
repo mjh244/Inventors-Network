@@ -221,7 +221,7 @@ degreePerInventor = []
 closenessPerInventor = []
 betweennessPerInventor = []
 eigenvectorPerInventor = []
-inventors = inventors.tolist()
+inventors = list(inventors)
 
 #just trying to figure out the bounds
 print("inventors")
@@ -233,7 +233,7 @@ print(len(eigenvector))
 
 # Gets the metrics based on company key and stores them in order of company to merge with df
 #this was changed to loop through the length of companies so we dont get an out of bounds error
-for i in range(len(companies)):
+for i in range(len(inventors)):
     degreePerInventor.append(degree.get(inventors[i]))
     closenessPerInventor.append(closeness.get(inventors[i]))
     betweennessPerInventor.append(betweenness.get(inventors[i]))
