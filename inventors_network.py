@@ -217,15 +217,15 @@ eigenvector = nx.eigenvector_centrality(inventorNetwork, max_iter=1000)
 print("eigenvector calculated")
 
 # Lists to hold company centrality metrics
-degreePerCompany = []
-closenessPerCompany = []
-betweennessPerCompany = []
-eigenvectorPerCompany = []
-companies = companies.tolist()
+degreePerInventor = []
+closenessPerInventor = []
+betweennessPerInventor = []
+eigenvectorPerInventor = []
+inventors = inventors.tolist()
 
 #just trying to figure out the bounds
-print("companies")
-print(len(companies))
+print("inventors")
+print(len(inventors))
 print(len(degree))
 print(len(closeness))
 print(len(betweenness))
@@ -234,10 +234,10 @@ print(len(eigenvector))
 # Gets the metrics based on company key and stores them in order of company to merge with df
 #this was changed to loop through the length of companies so we dont get an out of bounds error
 for i in range(len(companies)):
-    degreePerCompany.append(degree.get(companies[i]))
-    closenessPerCompany.append(closeness.get(companies[i]))
-    betweennessPerCompany.append(betweenness.get(companies[i]))
-    eigenvectorPerCompany.append(eigenvector.get(companies[i]))
+    degreePerInventor.append(degree.get(inventors[i]))
+    closenessPerInventor.append(closeness.get(inventors[i]))
+    betweennessPerInventor.append(betweenness.get(inventors[i]))
+    eigenvectorPerInventor.append(eigenvector.get(inventors[i]))
 
 print("Finished computing lists \n")
 
@@ -245,10 +245,10 @@ print("Finished computing lists \n")
 df = df.head(len(degree))
 
 # Adds the metrics to the dataframe
-df['Degree'] = degreePerCompany
-df['Closeness'] = closenessPerCompany
-df['Betweeness'] = betweennessPerCompany
-df['Eigenvector'] = eigenvectorPerCompany
+df['Degree'] = degreePerInventor
+df['Closeness'] = closenessPerInventor
+df['Betweeness'] = betweennessPerInventor
+df['Eigenvector'] = eigenvectorPerInventor
 
 # Drops rows with empty fields and saves the df
 df = df.dropna()
@@ -276,34 +276,3 @@ nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_siz
 plt.title("Inventors Network (Subset)")
 plt.show()
 
-
-# Calculation on inventors node
-degreePerInventor = []
-closenessPerInventor = []
-betweennessPerInventor = []
-eigenvectorPerInventor = []
-inventors = inventors.tolist()
-
-for i in range(len(companies)):
-    degreePerInventor.append(degree.get(inventors[i]))
-    closenessPerInventor.append(closeness.get(inventors[i]))
-    betweennessPerInventor.append(betweenness.get(inventors[i]))
-    eigenvectorPerInventor.append(eigenvector.get(inventors[i]))
-
-print("Finished computing lists \n")
-
-# Limits df to number of companies centrality was calculated for
-df = df.head(len(degree))
-
-# Adds the metrics to the dataframe
-df['Degree'] = degreePerInventor
-df['Closeness'] = closenessPerInventor
-df['Betweeness'] = betweennessPerInventor
-df['Eigenvector'] = eigenvectorPerInventor
-
-# Drops rows with empty fields and saves the df
-df = df.dropna()
-#dataframe with metrics shown
-print("Dataframe with metrics")
-print(df)
-df.to_csv('inventor-patent-ten-thousand-nodes.csv')
