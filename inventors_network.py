@@ -31,7 +31,9 @@ df.to_csv('inventor-patent.csv')
 #print(df)
 #fulldf = df.copy()
 
-
+######################################
+# Stock Data Retrieval
+######################################
 stocksDF = pd.read_csv('invpat/ticker_list.csv')
 
 # Prints the dataframe containing various stock names and tickers
@@ -45,11 +47,6 @@ companyNames = df["Assignee"].tolist()
 #companyNames = fulldf["Assignee"].tolist()
 stockNames = stocksDF["Name"].tolist()
 tickers = stocksDF["Ticker"].tolist()
-
-
-
-
-
 
 #split up names of comapnies in dataset and those in ticker
 #so we can match first name of company
