@@ -252,7 +252,7 @@ df = df.dropna()
 #dataframe with metrics shown
 print("Dataframe with metrics")
 print(df)
-df.to_csv('inventor-patent-ten-thousand-nodes.csv')
+df.to_csv('inventor-patent-stock-centrality.csv')
 # Gathers company names to gather nodes
 allNodesByCompany = inventorNetwork.nodes(data = True)
 allNodesByCompany2 = list(inventorNetwork.nodes)
