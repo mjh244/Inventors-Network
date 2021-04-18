@@ -22,7 +22,7 @@ df = pd.read_csv('invpat.csv', dtype={'Zipcode': str, 'AsgNum': str, 'Invnum_N_U
 df = df.drop(['Street', 'Lat', 'Lng', 'InvSeq', 'AsgNum', 'Class', 'Invnum', 'Invnum_N', 'Invnum_N_UC', 'Density', 'Precision', 'Recall'], axis = 1)
 df = df.dropna()
 #set nodelimit early to make calculation and testing faster = 1000
-df_starting_size = 1000
+df_starting_size = 30000
 #we will not load the whole dataset for testing purposes, not sure if this speeds anything up so I commented it out
 df = df.head(df_starting_size)
 
@@ -34,6 +34,9 @@ df.to_csv('inventor-patent.csv')
 ######################################
 # Stock Data Retrieval
 ######################################
+
+# Ticker Retrieval Section
+
 stocksDF = pd.read_csv('invpat/ticker_list.csv')
 
 # Prints the dataframe containing various stock names and tickers
@@ -48,31 +51,18 @@ companyNames = df["Assignee"].tolist()
 stockNames = stocksDF["Name"].tolist()
 tickers = stocksDF["Ticker"].tolist()
 
-#split up names of comapnies in dataset and those in ticker
-#so we can match first name of company
-for i in range(len(companyNames)):
-    companyNames[i] = companyNames[i].split()[0]
-
-for i in range(len(stockNames)):
-    stockNames[i] = stockNames[i].split()[0]
-
 # Gets the tickers of the companies from the new stocksDF
 for i in range(len(df)):
     for j in range(len(stockNames)):
         # Checks if first word of assignee is equal to first word of stock name
         # Then adds the ticker to the list
-        if (companyNames[i] == stockNames[j]):
+        if (companyNames[i].split()[0] == stockNames[j].split()[0]):
             companyTickers.append(tickers[j])
             break
-    # If nothing was added, add a None. This way when we merge the tickets with the df,
-    # we can take out rows that don't correspond to a ticket.
-    # i think its easier to do the np.nan here than to replace None later, it was throwing boolean errors with None
-
+    # If nothing was added, do np.nan
     #the bound being <= is for when i=0, i dont think it chanegs behvaior for anything else.
-
     if (len(companyTickers) <= i):
         companyTickers.append(np.nan)
-        # companyTickers.append(None)
 
 
 
@@ -91,6 +81,8 @@ print(tickers)
 print("THIS IS DF")
 print(df)
 
+# Price Retrieval Section
+
 ticker_list = df['Tickers'].to_numpy()
 print("tickers follow")
 print(ticker_list)
@@ -101,13 +93,17 @@ for i in ticker_list:
     hist = stock.history(period="max")
     hist_list.append(hist)
 print("this is history of only the first ticker")
-an_history = hist_list[0]
+#an_history = hist_list[0]
+an_history = hist_list[len(hist_list) - 1]
 print(an_history)
 print(an_history.keys())
 
 print("historical info is of type" + str(type(hist_list[0])))
 
-
+print("Length of list that holds ticker history")
+print(len(hist_list))
+print("Length of list that holds tickers")
+print(len(ticker_list))
 
 print("this is dataframe")
 print(df)
@@ -146,19 +142,70 @@ for i in range(len(dates_list)):
         prev_date = prev_date.replace(curr_year, prev_year)
         next_date = curr_date.replace(curr_month, next_month)
         next_date = next_date.replace(curr_year, next_year)
-        if curr_date in history.index:
+        if ((curr_date in history.index) and (next_date in history.index) and (prev_date in history.index)):
             closing_price_current.append(history.at[curr_date, 'Close'])
-        if next_date in history.index:
             closing_price_next.append(history.at[next_date, 'Close'])
-        if prev_date in history.index:
             closing_price_prior.append(history.at[prev_date, 'Close'])
+        else:
+            closing_price_current.append(np.nan)
+            closing_price_next.append(np.nan)
+            closing_price_prior.append(np.nan)
+        if (i == 235):
+            print("i = 238 for LYTS stock test")
+            print(curr_date)
+            print(history.at["01/17/1994", 'Close'])
+            print(history.at["02/17/1994", 'Close'])
+            print(history.at["03/17/1994", 'Close'])
+            print(history.at[prev_date, 'Close'])
+            print(history.at[curr_date, 'Close'])
+            print(history.at[next_date, 'Close'])
+    else:
+        curr_date_year = curr_date[0:4]
+        curr_date_month = curr_date[4:6]
+        curr_date_day = curr_date[6:8]
+        curr_date = curr_date_month + "/" + curr_date_day + "/" + curr_date_year
+        print(curr_date)
+        d = datetime.datetime.strptime(curr_date, "%m/%d/%Y")
+        curr_date = datetime.date.strftime(d, '%Y-%m-%d')
+        curr_year = int(curr_date[:4])
+        curr_month = int(curr_date[5:7])
+        #processing to get dates one month before and after patent
+        if curr_month < 12:
+            next_month = str(curr_month + 1)
+            next_year = str(curr_year)
+        else:
+            next_month = str(1)
+            next_year = str(curr_year + 1)
+        if curr_month > 1:
+            prev_month = str(curr_month - 1)
+            prev_year = str(curr_year)
+        else:
+            prev_month = str(12)
+            prev_year = str(curr_year - 1)
+        curr_month = str(curr_month)
+        curr_year = str(curr_year)
+        prev_date = curr_date.replace(curr_month, prev_month)
+        prev_date = prev_date.replace(curr_year, prev_year)
+        next_date = curr_date.replace(curr_month, next_month)
+        next_date = next_date.replace(curr_year, next_year)
+        if ((curr_date in history.index) and (next_date in history.index) and (prev_date in history.index)):
+            closing_price_current.append(history.at[curr_date, 'Close'])
+            closing_price_next.append(history.at[next_date, 'Close'])
+            closing_price_prior.append(history.at[prev_date, 'Close'])
+        else:
+            closing_price_current.append(np.nan)
+            closing_price_next.append(np.nan)
+            closing_price_prior.append(np.nan)
+    #print(closing_price_next)
+
+print(closing_price_next)
 #padding missing values with zeros
-while len(closing_price_current) < len(dates_list):
-    closing_price_current.append(0)
-while len(closing_price_next) < len(dates_list):
-    closing_price_next.append(0)
-while len(closing_price_prior) < len(dates_list):
-    closing_price_prior.append(0)
+#while len(closing_price_current) < len(dates_list):
+#    closing_price_current.append(0)
+#while len(closing_price_next) < len(dates_list):
+#    closing_price_next.append(0)
+#while len(closing_price_prior) < len(dates_list):
+#    closing_price_prior.append(0)
 df['Closing Price'] = closing_price_current
 df['Closing Price Last Month'] = closing_price_prior
 df['Closing Price Next Month'] = closing_price_next
@@ -244,7 +291,7 @@ df = df.head(len(degree))
 # Adds the metrics to the dataframe
 df['Degree'] = degreePerInventor
 df['Closeness'] = closenessPerInventor
-df['Betweeness'] = betweennessPerInventor
+df['Betweenness'] = betweennessPerInventor
 df['Eigenvector'] = eigenvectorPerInventor
 
 # Drops rows with empty fields and saves the df
