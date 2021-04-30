@@ -1,6 +1,5 @@
 # Authors: Group 7 - McKenzie Hawkins, Alexander Mazon, Haolin Hu
 
-
 # Imports
 import pandas as pd
 import datetime
@@ -8,8 +7,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import yfinance as yf
-
-
+import re
 
 ######################################
 # Data Manipulation
@@ -21,10 +19,9 @@ df = pd.read_csv('invpat.csv', dtype={'Zipcode': str, 'AsgNum': str, 'Invnum_N_U
 # Removes unecessary field (WE MAY HAVE TO CHANGE IT TO OTHER FIELDS WE WANT TO REMOVE)
 df = df.drop(['Street', 'Lat', 'Lng', 'InvSeq', 'AsgNum', 'Class', 'Invnum', 'Invnum_N', 'Invnum_N_UC', 'Density', 'Precision', 'Recall'], axis = 1)
 df = df.dropna()
-#set nodelimit early to make calculation and testing faster = 1000
-df_starting_size = 30000
-#we will not load the whole dataset for testing purposes, not sure if this speeds anything up so I commented it out
-df = df.head(df_starting_size)
+# Sets row limit early to make calculation and testing faster
+#df_starting_size = 30000
+#df = df.head(df_starting_size)
 
 # Saves the filtered inventor dataframe as csv
 df.to_csv('inventor-patent.csv')
@@ -47,21 +44,51 @@ companyTickers = []
 
 #assigns arrays to proper fields in the dataset
 companyNames = df["Assignee"].tolist()
-#companyNames = fulldf["Assignee"].tolist()
 stockNames = stocksDF["Name"].tolist()
 tickers = stocksDF["Ticker"].tolist()
 
+'''
+for i in range(len(companyNames)):
+    companyName = companyNames[i]
+    companyName = re.sub(" INC.", '', companyName)
+    companyName = re.sub(" INC", '', companyName)
+    companyName = re.sub(" INCORPORATED", '', companyName)
+    companyName = re.sub(" CORPORATION", '', companyName)
+    companyName = re.sub(" CORP", '', companyName)
+    companyName = re.sub(" LLC", '', companyName)
+    companyNames[i] = companyName
+    if i < 100:
+        print(companyName)
+'''
+for i in range(len(companyNames)):
+    companyNames[i] = companyNames[i].split()[0]
+
+for i in range(len(stockNames)):
+    stockNames[i] = stockNames[i].split()[0]
+
+print("Company Names length")
+print(len(companyNames))
+
+print("Length Company Names")
+print(len(companyNames))
+
+print("Length df")
+print(len(df))
+
 # Gets the tickers of the companies from the new stocksDF
 for i in range(len(df)):
-    for j in range(len(stockNames)):
-        # Checks if first word of assignee is equal to first word of stock name
+    if i % 100000 == 0:
+        print("Rows checked")
+        print(i)
+        # Checks if first word of assignee is equal to first word of a stock name
+    if (companyNames[i] in stockNames):
         # Then adds the ticker to the list
-        if (companyNames[i].split()[0] == stockNames[j].split()[0]):
-            companyTickers.append(tickers[j])
-            break
-    # If nothing was added, do np.nan
-    #the bound being <= is for when i=0, i dont think it chanegs behvaior for anything else.
-    if (len(companyTickers) <= i):
+        for j in range(len(stockNames)):
+            if (companyNames[i] == stockNames[j]):
+                companyTickers.append(tickers[j])
+                break
+    # Else adds a nan
+    else:
         companyTickers.append(np.nan)
 
 
@@ -70,10 +97,12 @@ for i in range(len(df)):
 #df = df.replace(to_replace=None, value=np.nan).dropna()
 #df = df.head(len(companyTickers))
 
+print(len(companyTickers))
 # creates a new column in the df with the ticker values
 df['Tickers'] = companyTickers
-#drop rows from df with no ticker data
+# Drops rows from df with no ticker data
 df = df.dropna()
+df.to_csv('inventor-patent-tickers.csv')
 ####################################################################
 print("THIS IS TICKERS")
 print(tickers)
@@ -114,6 +143,8 @@ closing_price_next=[]
 dates_list = df['AppDate'].to_numpy()
 
 for i in range(len(dates_list)):
+    if i % 1000 == 0:
+        print(i)
     history = hist_list[i]
     curr_date = dates_list[i]
     #convert date to the correct format so we can match to find closing price, the problem is that
