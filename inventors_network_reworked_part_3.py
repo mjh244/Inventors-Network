@@ -17,31 +17,31 @@ from sklearn.neural_network import MLPClassifier
 # The link to that project is below
 # https://colab.research.google.com/drive/1bmFoikf-GIq7JGQZRdhSqwoXnPkZMSsn?authuser=1#scrollTo=qkXa_6SYKhEf
 
+# Initializes  lists to store features and labels
 features = []
 labels = []
-data = []
 
-with open('inventor-patent-tickers-dates-prices-centrality-to-numbers-full.csv','r') as file:
+with open('inventor-patent-tickers-dates-prices-centrality-to-numbers.csv','r') as file:
   for line in csv.reader(file):
       #print(len(line))
       if (line[0] != "Firstname"):
         features.append(line[1:16]+line[17:20])
         labels.append(line[16])
 
+# Prints out length of entries and some lables
 print(len(features))
 print(labels[0:25])
 
-print(len(labels))
-print(type(features))
+# Turns features and labels to floats to perform ML
 features = np.asarray(features)
 features = features.astype(np.float64)
 labels = np.asarray(labels)
 labels = labels.astype(np.float64)
 
+# Initializes accuracy values
 gnb_acc = 0
 svc_acc = 0
 dt_acc = 0
-linearSVC_acc = 0
 clf_acc = 0
 
 # Trains/tests the models 100 times and sums results to average at the end
@@ -62,15 +62,15 @@ for i in range(100):
   dt_predictions = classifierTree.predict(features_test)
   dt_acc += accuracy_score(labels_test, dt_predictions)
 
-'''
+"""
   # Neural Net
-  clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+  clf = MLPClassifier(solver='sgd')
   clf = clf.fit(features_train, labels_train)
   clf_predictions = clf.predict(features_test)
   clf_acc += accuracy_score(labels_test, clf_predictions)
-'''
 
-"""
+# SMV SVC
+
   classifierSVC = svm.SVC(kernel = 'linear', class_weight='balanced')
   classifierSVC = classifierSVC.fit(features_train, labels_train)
   svc_predictions = classifierSVC.predict(features_test)
@@ -85,5 +85,5 @@ dt_acc = dt_acc / 100
 print("GNB Accuracy:", gnb_acc)
 #print("SVC Accuracy:", svc_acc)
 print("DT Accuracy:", dt_acc)
-#print("NN Accuracy:", clf_acc)
+print("NN Accuracy:", clf_acc)
 print()

@@ -9,6 +9,7 @@ import yfinance as yf
 
 # Methods
 # Obtained from https://www.geeksforgeeks.org/binary-search-bisect-in-python/
+# Used to perform quicker searching
 def BinarySearch(a, x):
     i = bisect_left(a, x)
     if i != len(a) and a[i] == x:
@@ -29,11 +30,9 @@ df = pd.read_csv('datasets/invpat.csv', dtype={'Zipcode': str, 'AsgNum': str, 'I
 df = df.drop(['Street', 'Lat', 'Lng', 'InvSeq', 'AsgNum', 'Class', 'Invnum', 'Invnum_N', 'Invnum_N_UC', 'Density', 'Precision', 'Recall'], axis = 1)
 df = df.dropna()
 
-print("Sorting datast by company to make comparisons faster")
+print("Sorting inventor datast by assignees to make comparisons faster")
 df = df.sort_values(by="Assignee")
 
-# Saves the filtered inventor dataframe as csv
-df.to_csv('datasets/inventor-patent-sort-by-assignee.csv')
 print(df)
 
 ######################################
@@ -43,7 +42,7 @@ print(df)
 # Reads in a seperate dataset with tickers and company names from Quandl
 stocksDF = pd.read_csv('datasets/ticker_list.csv')
 
-print("Sorting datast by company to make comparisons faster")
+print("Sorting ticker datast by names to make comparisons faster")
 stocksDF = stocksDF.sort_values(by='Name')
 
 # Prints the dataframe containing various stock names and tickers
@@ -57,7 +56,7 @@ companyNames = df["Assignee"].tolist()
 stockNames = stocksDF["Name"].tolist()
 tickers = stocksDF["Ticker"].tolist()
 
-# Formats assignee and company names across the two datasets to make matching easier
+# Formats assignee names to make matching easier
 for i in range(len(companyNames)):
     companyNames[i] = companyNames[i].upper()
     if ' ' in companyNames[i]:
@@ -67,6 +66,7 @@ for i in range(len(companyNames)):
         else:
             companyNames[i] = companyNames[i].split()[0] + " " + companyNames[i].split()[1]
 
+# Formats stock comapny names to make matching easier
 for i in range(len(stockNames)):
     stockNames[i] = stockNames[i].upper()
     if ' ' in stockNames[i]:
@@ -97,12 +97,9 @@ df['Tickers'] = companyTickers
 
 # Drops rows from df with no ticker data
 df = df.dropna()
-df.to_csv('datasets/inventor-patent-tickers.csv')
 
-print("This is our inventor dataset")
+print("This is our inventor dataset after name matching for stock tickers")
 print(df)
-
-df.to_csv('datasets/inventor-patent-tickers-full.csv')
 
 dates_list = df['AppDate'].to_numpy()
 
@@ -113,13 +110,13 @@ month_after_app_date = []
 
 ticker_list = df['Tickers'].to_numpy()
 
-# Removes uplicates from the list
+# Removes duplicates from the list and sorts it to be used for efficient searching
 ticker_list_set = set(ticker_list)
 ticker_list = list(ticker_list_set)
 ticker_list.sort()
-print("Length of ticker_list after set")
-print(len(ticker_list))
+print("Length of ticker_list after set", len(ticker_list))
 
+# Initializes list to store historical stock dates and prices for tickers
 hist_list=[]
 counter = 0
 
@@ -130,7 +127,7 @@ for i in ticker_list:
         print("Stock price download progress:", ((counter/len(ticker_list)) * 100), "%")
         print(counter)
     stock = yf.Ticker(i)
-    # Sets period to get stock data from and retrieves it
+    # Sets period to get closing stock price from and retrieves it
     hist = stock.history(period="max", interval="1d")["Close"]
     hist_list.append(hist)
     counter = counter + 1
@@ -141,6 +138,7 @@ prev_dates = []
 of_dates = []
 next_dates = []
 
+# Gets the application dates from the df and stores it
 dates_list = df['AppDate'].to_numpy()
 
 # Attempts to standardize date format
@@ -220,8 +218,7 @@ for i in range(len(dates_list)):
             next_dates.append(np.nan)
 print("Date formatting progress: 100 %")
 
-ticker_col = list(df["Tickers"])
-
+# Initializes lists to store stock dates as strings to be searched
 hist_list_str = []
 
 # Converts the datetimeindex objects to strings
@@ -230,34 +227,42 @@ for i in range(len(hist_list)):
     for j in range(len(hist_list[i].index)):
         hist_list_str[i].append(str(hist_list[i].index[j])[0:10])
 
+# Gets tickers from df and stores it in a list
+ticker_col = list(df["Tickers"])
+
 # Initializes lists to store stock prices at specific dates
 closing_price_prior=[]
 closing_price_current=[]
 closing_price_next=[]
 
-# Finds the stock price based on the retrieved histories.
+# Finds the stock price based on the retrieved histories
 for i in range(len(dates_list)):
     if i % 100000 == 0:
         print("Price gathering progress:", ((i/len(dates_list)) * 100), "%")
     try:
         ticker_index = BinarySearch(ticker_list, ticker_col[i])
+        # If the ticker is in the ticker_list, see if the dates are in there as well
         if ticker_index != -1:
             history = hist_list[ticker_index]
             bin_value_before = BinarySearch(hist_list_str[ticker_index], prev_dates[i])
             bin_value_of = BinarySearch(hist_list_str[ticker_index], of_dates[i])
             bin_value_after = BinarySearch(hist_list_str[ticker_index], next_dates[i])
+            # If the three dates are in the hist_list_str, then store the prices for that date and ticker
             if bin_value_before != -1 and bin_value_of != -1 and bin_value_after != -1:
                 closing_price_current.append(history[bin_value_of])
                 closing_price_next.append(history[bin_value_after])
                 closing_price_prior.append(history[bin_value_before])
+            # Else add a nan because we need allo three dates
             else:
                 closing_price_current.append(np.nan)
                 closing_price_next.append(np.nan)
                 closing_price_prior.append(np.nan)
+        # Else add a nan because we don't have the data
         else:
             closing_price_current.append(np.nan)
             closing_price_next.append(np.nan)
             closing_price_prior.append(np.nan)
+    # Add a nan if there was an error
     except:
         closing_price_current.append(np.nan)
         closing_price_next.append(np.nan)
@@ -274,6 +279,6 @@ df['Closing Price Next Month'] = closing_price_next
 df = df.dropna()
 print("Current Inventor Dataset")
 print(df)
-df.to_csv('datasets/inventor-patent-tickers-prices-full.csv')
+df.to_csv('datasets/inventor-patent-tickers-dates-prices.csv')
 
 

@@ -8,33 +8,37 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 # Reads in dataframe with stock prices obtained from Google Sheets
-#df = pd.read_csv('inventor-patent-tickers-dates-prices-full.csv')
-df = pd.read_csv('inventor-patent-tickers-prices-full.csv')
+df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices.csv')
+
+# Drops an extra col that got added and drops na
 df = df.drop(['Unnamed: 0'], axis=1)
 df = df.dropna()
-print(len(df))
-print(df)
-print(len(df))
 
+print(df)
+
+# Renames columns from previous part to match this part
 df = df.rename(columns={"Closing Price Last Month":"Price a Month Before"})
 df = df.rename(columns={"Closing Price":"Price the Day of"})
 df = df.rename(columns={"Closing Price Next Month":"Price a Month After"})
 
+# Gets the dates from the df and stores them in a list as floats
 last_month = df["Price a Month Before"].astype(float)
 current_month = df["Price the Day of"].astype(float)
 next_month = df["Price a Month After"].astype(float)
 
-test_set = df["Assignee"]
-test_set = set(test_set)
-print("NUMBER OF COMPANIES")
-print(len(test_set))
+# Turns current col of assignees to a set to see number of unique companies
+num_comp = df["Assignee"]
+num_comp = set(num_comp)
+print("Number of unique companies", len(num_comp))
 
-
+# Computes the change col for labels in ML
+# Shows whether price incrased or decreased from app date to month after
 change = [next_month-current_month > 0]
 change = np.array(change)
 change = change.astype(int)
 print(change[0])
 
+# Adds the change col to the df
 df["Change"] = change[0]
 
 #####################################
@@ -44,6 +48,7 @@ df["Change"] = change[0]
 # Creates the graphs
 inventorNetwork = nx.Graph()
 
+# Gets the inventor names, patents, and assignees from the df and stores them in a list to use for network
 firstNames = df["Firstname"].values
 lastNames = df["Lastname"].values
 inventors = []
@@ -52,7 +57,7 @@ for i in range(len(firstNames)):
 patents = df["Patent"].values
 companies = df["Assignee"].values
 
-#We add nodes to the graph one at a time by looping through the new df
+# We add nodes to the graph one at a time by looping through the new df
 for i in range(len(df)):
 
     # Adds nodes to the network if they weren't already in the network
@@ -85,7 +90,7 @@ print("eigenvector calculated")
 degreePerInventor = []
 betweennessPerInventor = []
 eigenvectorPerInventor = []
-inventors = list(inventors)
+#inventors = list(inventors)
 
 # Gets the metrics based on company key and stores them in order of company to merge with df
 for i in range(len(inventors)):
@@ -105,7 +110,7 @@ df = df.dropna()
 
 print("Dataframe with metrics")
 print(df)
-df.to_csv('inventor-patent-stock-centrality.csv')
+df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality.csv')
 
 # Gathers company names to gather nodes
 allNodesByCompany = inventorNetwork.nodes(data = True)
@@ -146,7 +151,7 @@ df = df.drop(['Price a Month After'], axis=1)
 df = df.drop(['AppDate'], axis=1)
 
 
-df.to_csv('inventor-patent-tickers-dates-prices-centrality-to-numbers-full.csv', index=False)
+df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv', index=False)
 print("PRINTING")
 print(df)
 
