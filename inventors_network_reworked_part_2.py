@@ -1,3 +1,6 @@
+# Authors: Group 7 - McKenzie Hawkins, Alexander Mazon, Haolin Hu
+
+# Imports
 import pandas as pd
 import csv
 import numpy as np
@@ -11,10 +14,8 @@ df = df.drop(['Unnamed: 0'], axis=1)
 df = df.dropna()
 print(len(df))
 print(df)
-#df = df[df["Price a Month Before"] != '#VALUE!']
-#df = df[df["Price the Day of"] != '#VALUE!']
-#df = df[df["Price a Month After"] != '#VALUE!']
 print(len(df))
+
 df = df.rename(columns={"Closing Price Last Month":"Price a Month Before"})
 df = df.rename(columns={"Closing Price":"Price the Day of"})
 df = df.rename(columns={"Closing Price Next Month":"Price a Month After"})
@@ -110,9 +111,7 @@ df.to_csv('inventor-patent-stock-centrality.csv')
 allNodesByCompany = inventorNetwork.nodes(data = True)
 allNodesByCompany2 = list(inventorNetwork.nodes)
 
-
-#Sets node limit for subset network, I had to set it to 10 so it would be small
-# enough given the initial size of our df was cut down by so much
+# Sets node limit for subset network
 nodeNames = []
 nodeSubsetLimit = 10
 for i in range(nodeSubsetLimit):
@@ -126,7 +125,6 @@ inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
 nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=100)
 plt.title("Inventors Network (Subset)")
 plt.show()
-
 
 
 str_cols = df.keys()
@@ -146,13 +144,7 @@ for col in str_cols:
 
 df = df.drop(['Price a Month After'], axis=1)
 df = df.drop(['AppDate'], axis=1)
-#df = df.drop(['Month After Application Date'], axis=1)
-#pd.set_option('max_columns', None)
-#print(df)
 
-# JUST ADDED, converts dates to floats for ML stage
-#df["Price a Month Before"] = df["Price a Month Before"].astype(float)
-#df["Price the Day of"] = df["Price the Day of"].astype(float)
 
 df.to_csv('inventor-patent-tickers-dates-prices-centrality-to-numbers-full.csv', index=False)
 print("PRINTING")

@@ -1,3 +1,6 @@
+# Authors: Group 7 - McKenzie Hawkins, Alexander Mazon, Haolin Hu
+
+# Imports
 import pandas as pd
 import csv
 from numpy import array
@@ -41,18 +44,11 @@ dt_acc = 0
 linearSVC_acc = 0
 clf_acc = 0
 
-gnb_ttr, gnb_tnr = 0, 0
-svc_ttr, svc_tnr = 0, 0
-dt_ttr, dt_tnr = 0, 0
-
 # Trains/tests the models 100 times and sums results to average at the end
 for i in range(100):
 
   # Splits data into 80% training and 20% testing
   features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
-
-  #features_train = list(features_train)
-  #labels_train = list(labels_train)
 
   # Gaussian Naive Bayes
   classifierNB = GaussianNB()
