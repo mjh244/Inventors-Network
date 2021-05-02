@@ -58,24 +58,23 @@ stockNames = stocksDF["Name"].tolist()
 tickers = stocksDF["Ticker"].tolist()
 
 for i in range(len(companyNames)):
+    companyNames[i] = companyNames[i].upper()
     if ' ' in companyNames[i]:
         # Checks if inc or corp are in the second word as they aren't always listed the same in both datasets
-        if "inc".upper() in companyNames[i].split()[1].upper() or "corp".upper() in companyNames[i].split()[1].upper():
-            companyNames[i] = companyNames[i].split()[0].upper()
+        if "INC" in companyNames[i].split()[1] or "CORP" in companyNames[i].split()[1]:
+            companyNames[i] = companyNames[i].split()[0]
         else:
-            companyNames[i] = companyNames[i].split()[0].upper() + " " + companyNames[i].split()[1].upper()
-    else:
-        companyNames[i] = companyNames[i].upper()
+            companyNames[i] = companyNames[i].split()[0] + " " + companyNames[i].split()[1]
+        
 
 for i in range(len(stockNames)):
+    stockNames[i] = stockNames[i].upper()
     if ' ' in stockNames[i]:
         # Checks if inc or corp are in the second word as they aren't always listed the same in both datasets
-        if "inc".upper() in stockNames[i].split()[1].upper() or "corp".upper() in stockNames[i].split()[1].upper():
-            stockNames[i] = stockNames[i].split()[0].upper()
+        if "INC" in stockNames[i].split()[1] or "CORP" in stockNames[i].split()[1]:
+            stockNames[i] = stockNames[i].split()[0]
         else:
-            stockNames[i] = stockNames[i].split()[0].upper() + " " + stockNames[i].split()[1].upper()
-    else:
-        stockNames[i] = stockNames[i].upper()
+            stockNames[i] = stockNames[i].split()[0] + " " + stockNames[i].split()[1]
 
 print("Length Company Names")
 print(len(companyNames))
@@ -83,16 +82,13 @@ print(len(companyNames))
 print("Length df")
 print(len(df))
 
-# Convert to set to make lookup more efficient
-#stockNames = set(stockNames)
-
 # Gets the tickers of the companies from the new stocksDF
 for i in range(len(df)):
     # Prints out progress
     if i % 100000 == 0:
         print("Rows checked out of", len(df))
         print(i)
-        # Checks if first word of assignee is equal to first word of a stock name
+    # Checks if first word of assignee is equal to first word of a stock name
     bin_value = BinarySearch(stockNames, companyNames[i])
     if bin_value != -1:
         companyTickers.append(tickers[bin_value])

@@ -5,18 +5,29 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 # Reads in dataframe with stock prices obtained from Google Sheets
-df = pd.read_csv('inventor-patent-tickers-dates-prices-full.csv')
-
+#df = pd.read_csv('inventor-patent-tickers-dates-prices-full.csv')
+df = pd.read_csv('inventor-patent-tickers-prices-full.csv')
+df = df.drop(['Unnamed: 0'], axis=1)
 df = df.dropna()
 print(len(df))
 print(df)
-df = df[df["Price a Month Before"] != '#VALUE!']
-df = df[df["Price the Day of"] != '#VALUE!']
-df = df[df["Price a Month After"] != '#VALUE!']
+#df = df[df["Price a Month Before"] != '#VALUE!']
+#df = df[df["Price the Day of"] != '#VALUE!']
+#df = df[df["Price a Month After"] != '#VALUE!']
 print(len(df))
+df = df.rename(columns={"Closing Price Last Month":"Price a Month Before"})
+df = df.rename(columns={"Closing Price":"Price the Day of"})
+df = df.rename(columns={"Closing Price Next Month":"Price a Month After"})
+
 last_month = df["Price a Month Before"].astype(float)
 current_month = df["Price the Day of"].astype(float)
 next_month = df["Price a Month After"].astype(float)
+
+test_set = df["Assignee"]
+test_set = set(test_set)
+print("NUMBER OF COMPANIES")
+print(len(test_set))
+
 
 change = [next_month-current_month > 0]
 change = np.array(change)
@@ -126,16 +137,18 @@ print(str_cols)
 for col in str_cols:
   if ((col == 'Firstname') or (col == 'Lastname') or (col == 'City') or (col == 'State') or (col == 'Country') 
   or (col == 'Zipcode') or (col == 'Patent') or (col == 'AppYear') or (col == 'GYear') or (col == 'AppDate') 
-  or (col == 'Assignee') or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')):
+  or (col == 'Assignee') or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')
+  or (col == 'Month After Application Date')):
     df[col] = pd.Categorical(df[col], ordered=True).codes
     pd.to_numeric(df[col], downcast='float')
 #df = df.apply(pd.to_numeric)
 #print(df)
 
-
-df = df.drop(['Month After Application Date'], axis=1)
-pd.set_option('max_columns', None)
-print(df)
+df = df.drop(['Price a Month After'], axis=1)
+df = df.drop(['AppDate'], axis=1)
+#df = df.drop(['Month After Application Date'], axis=1)
+#pd.set_option('max_columns', None)
+#print(df)
 
 # JUST ADDED, converts dates to floats for ML stage
 #df["Price a Month Before"] = df["Price a Month Before"].astype(float)

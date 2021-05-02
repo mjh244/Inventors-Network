@@ -21,10 +21,11 @@ data = []
 with open('inventor-patent-tickers-dates-prices-centrality-to-numbers-full.csv','r') as file:
   for line in csv.reader(file):
       #print(len(line))
-      if (line[0] != "Unnamed: 0"):
-        features.append(line[2:18]+line[19:20])
-        labels.append(line[18])
+      if (line[0] != "Firstname"):
+        features.append(line[1:16]+line[17:20])
+        labels.append(line[16])
 
+print(len(features))
 print(labels[0:25])
 
 print(len(labels))
