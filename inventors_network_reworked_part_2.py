@@ -81,9 +81,9 @@ for i in range(len(df)):
 # Computes metrics for nodes
 degree = nx.degree_centrality(inventorNetwork)
 print("degree calculated")
-betweenness = nx.betweenness_centrality(inventorNetwork, 25, normalized = True, endpoints = False)
+betweenness = nx.betweenness_centrality(inventorNetwork, 10, normalized = True, endpoints = False)
 print("betweenness calculated")
-eigenvector = nx.eigenvector_centrality(inventorNetwork, max_iter=1000)
+eigenvector = nx.eigenvector_centrality(inventorNetwork, max_iter=500, tol=0.0001)
 print("eigenvector calculated")
 
 # Lists to hold company centrality metrics

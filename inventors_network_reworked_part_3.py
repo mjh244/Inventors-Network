@@ -21,7 +21,7 @@ from sklearn.neural_network import MLPClassifier
 features = []
 labels = []
 
-with open('inventor-patent-tickers-dates-prices-centrality-to-numbers.csv','r') as file:
+with open('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv','r') as file:
   for line in csv.reader(file):
       #print(len(line))
       if (line[0] != "Firstname"):
@@ -50,12 +50,6 @@ for i in range(100):
   # Splits data into 80% training and 20% testing
   features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
 
-  # Gaussian Naive Bayes
-  classifierNB = GaussianNB()
-  classifierNB = classifierNB.fit(features_train, labels_train)
-  gnb_predictions = classifierNB.predict(features_test)
-  gnb_acc += accuracy_score(labels_test, gnb_predictions)
-
   # Decision Tree
   classifierTree = tree.DecisionTreeClassifier(max_depth=9)
   classifierTree = classifierTree.fit(features_train, labels_train)
@@ -63,6 +57,12 @@ for i in range(100):
   dt_acc += accuracy_score(labels_test, dt_predictions)
 
 """
+  # Gaussian Naive Bayes
+  classifierNB = GaussianNB()
+  classifierNB = classifierNB.fit(features_train, labels_train)
+  gnb_predictions = classifierNB.predict(features_test)
+  gnb_acc += accuracy_score(labels_test, gnb_predictions)
+  
   # Neural Net
   clf = MLPClassifier(solver='sgd')
   clf = clf.fit(features_train, labels_train)
