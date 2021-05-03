@@ -25,11 +25,12 @@ with open('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.c
   for line in csv.reader(file):
       #print(len(line))
       if (line[0] != "Firstname"):
-        features.append(line[1:16]+line[17:20])
+        features.append(line[0:16]+line[17:20])
         labels.append(line[16])
 
 # Prints out length of entries and some lables
 print(len(features))
+print(features[0])
 print(labels[0:25])
 
 # Turns features and labels to floats to perform ML
@@ -62,7 +63,7 @@ for i in range(100):
   classifierNB = classifierNB.fit(features_train, labels_train)
   gnb_predictions = classifierNB.predict(features_test)
   gnb_acc += accuracy_score(labels_test, gnb_predictions)
-  
+
   # Neural Net
   clf = MLPClassifier(solver='sgd')
   clf = clf.fit(features_train, labels_train)
@@ -79,9 +80,9 @@ for i in range(100):
 
 
 gnb_acc = gnb_acc / 100
-#svc_acc = svc_acc / 100
+svc_acc = svc_acc / 100
 dt_acc = dt_acc / 100
-#clf_acc = clf_acc / 100
+clf_acc = clf_acc / 100
 print("GNB Accuracy:", gnb_acc)
 #print("SVC Accuracy:", svc_acc)
 print("DT Accuracy:", dt_acc)

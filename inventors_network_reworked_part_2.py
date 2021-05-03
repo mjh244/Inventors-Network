@@ -80,17 +80,16 @@ for i in range(len(df)):
 
 # Computes metrics for nodes
 degree = nx.degree_centrality(inventorNetwork)
-print("degree calculated")
+print("Degree calculated")
 betweenness = nx.betweenness_centrality(inventorNetwork, 10, normalized = True, endpoints = False)
-print("betweenness calculated")
+print("Betweenness calculated")
 eigenvector = nx.eigenvector_centrality(inventorNetwork, max_iter=500, tol=0.0001)
-print("eigenvector calculated")
+print("Eigenvector calculated")
 
 # Lists to hold company centrality metrics
 degreePerInventor = []
 betweennessPerInventor = []
 eigenvectorPerInventor = []
-#inventors = list(inventors)
 
 # Gets the metrics based on company key and stores them in order of company to merge with df
 for i in range(len(inventors)):
@@ -113,14 +112,13 @@ print(df)
 df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality.csv')
 
 # Gathers company names to gather nodes
-allNodesByCompany = inventorNetwork.nodes(data = True)
-allNodesByCompany2 = list(inventorNetwork.nodes)
+allNodesByCompany = list(inventorNetwork.nodes)
 
 # Sets node limit for subset network
 nodeNames = []
 nodeSubsetLimit = 10
 for i in range(nodeSubsetLimit):
-    nodeNames.append(allNodesByCompany2[i])
+    nodeNames.append(allNodesByCompany[i])
 
 # Creates subgraph of
 inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
@@ -132,26 +130,21 @@ plt.title("Inventors Network (Subset)")
 plt.show()
 
 
-str_cols = df.keys()
-str_cols = str_cols[1:]
-print(str_cols)
-
-# Map nominal features to numbers
-for col in str_cols:
+# Turns features to numbers
+for col in df.keys():
   if ((col == 'Firstname') or (col == 'Lastname') or (col == 'City') or (col == 'State') or (col == 'Country') 
   or (col == 'Zipcode') or (col == 'Patent') or (col == 'AppYear') or (col == 'GYear') or (col == 'AppDate') 
   or (col == 'Assignee') or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')
   or (col == 'Month After Application Date')):
     df[col] = pd.Categorical(df[col], ordered=True).codes
     pd.to_numeric(df[col], downcast='float')
-#df = df.apply(pd.to_numeric)
-#print(df)
 
+# Drops price a month after because we dont want to train on that
 df = df.drop(['Price a Month After'], axis=1)
+# Drops app date because we made a standardized date of the one they give
 df = df.drop(['AppDate'], axis=1)
 
-
+# Saves the dataframe with values converted to numbers to be used in ML
 df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv', index=False)
-print("PRINTING")
+print("Dataset with values converted to numbers")
 print(df)
-
