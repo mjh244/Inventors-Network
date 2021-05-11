@@ -24,9 +24,9 @@ https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/5F1RRI/OR5
 - sklearn
 
 # Our program is split into 3 parts and they are labeled as follows:
-- inventors_network_reworked_part_1.py, which contains the code for taking in the dataset and matching assignee names with tickers from the Quandl dataset. The dates for a month before, and a month after the patent application date are also computed and appended to the end of the dataframe. Then the stock prices for the companies are retrieved using yfinance and appended to the end of the dataframe, which is then save as a csv.
+- inventors_network_reworked_part_1.py, which contains the code for taking in the dataset and matching assignee names with tickers from the Quandl dataset. The dates for a month before, and a month after the patent application date are also computed and appended to the end of the dataframe. Then the stock prices for the companies are retrieved using yfinance and appended to the end of the dataframe, which is then saved as a csv.
     - Estimated Runtime: ~15 minutes mostly due to downloading stock data
-- inventors_network_reworked_part_2.py, which contains the code for taking in the new dataset with prices from Google Sheets, and creates a network based on the inventors, assignees, and patents. There are two resulting files that are both csv's that contain the degree, betweenness, and eigenvector centrality measures appended to the previous dataset. One file has each value converted to a number to be used in the machine learning, the other does not.
+- inventors_network_reworked_part_2.py, which creates a network based on the inventors, assignees, and patents. There are two resulting files that are both csv's that contain the degree, betweenness, and eigenvector centrality measures appended to the previous dataset. One dataset has each value converted to a number to be used in the machine learning, while the other does not.
     - Estimated Runtime: ~2 minutes
 - inventors_network_reworked_part_3.py, which contains the code for performing the machine learning on the dataset from part 2. This is where the results of machine learning is shown. Currently we are using a decision tree model that is getting approximately 69% accuracy.
     - Estimated Runtime: ~5 minutes
