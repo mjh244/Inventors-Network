@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# Reads in dataframe with stock prices obtained from Google Sheets
+# Reads in dataframe with stock prices
 df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices.csv')
 
 # Drops an extra col that got added and drops na
