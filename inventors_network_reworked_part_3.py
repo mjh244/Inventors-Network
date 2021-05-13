@@ -17,7 +17,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import validation_curve
 from sklearn.model_selection import GridSearchCV
 from pandas import read_csv
-from seaborn import scatterplot
+#from seaborn import scatterplot
 from matplotlib import pyplot as plt
 
 
