@@ -1,6 +1,6 @@
 import pandas as pd
-#import os
-#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Importing the dataset
 dataset = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality.csv')
@@ -71,9 +71,11 @@ print("about to normalize")
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 print("normalized")
+
 # Importing the Keras libraries and packages
 import keras
 from keras.models import Sequential #used to initialize the NN
+
 from keras.layers import Dense  #used to build the hidden Layers
 from keras.layers import Dropout
 
@@ -94,12 +96,31 @@ classifier.add(Dropout(0.1))
 classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
 print("about to compile")
 # Compiling the ANN
-classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['acc'])
 print("fitting")
-classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
+classifier_history = classifier.fit(X_train, y_train, batch_size = 10, epochs = 100, validation_data=(X_test, y_test))
 y_pred = classifier.predict(X_test)
 y_pred = (y_pred > 0.5)
+# plotting code comes from https://towardsdatascience.com/simple-guide-to-hyperparameter-tuning-in-neural-networks-3fe03dad8594
+# Plot the loss function
+fig, ax = plt.subplots(1, 1, figsize=(10,6))
+ax.plot(np.sqrt(classifier_history.history['loss']), 'r', label='train')
+ax.plot(np.sqrt(classifier_history.history['val_loss']), 'b' ,label='val')
+ax.set_xlabel(r'Epoch', fontsize=20)
+ax.set_ylabel(r'Loss', fontsize=20)
+ax.legend()
+ax.tick_params(labelsize=20)
+#plt.show()
 
+# Plot the accuracy
+fig, ax = plt.subplots(1, 1, figsize=(10,6))
+ax.plot(np.sqrt(classifier_history.history['acc']), 'r', label='train')
+ax.plot(np.sqrt(classifier_history.history['val_acc']), 'b' ,label='val')
+ax.set_xlabel(r'Epoch', fontsize=20)
+ax.set_ylabel(r'Accuracy', fontsize=20)
+ax.legend()
+ax.tick_params(labelsize=20)
+plt.show()
 # Making the Confusion Matrix
 from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(y_test, y_pred)
