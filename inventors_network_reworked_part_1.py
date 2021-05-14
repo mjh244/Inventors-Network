@@ -55,13 +55,13 @@ companyTickers = []
 #assigns arrays to proper fields in the dataset
 companyNames = df["Assignee"].tolist()
 stockNames = stocksDF["Name"].tolist()
-tickers = stocksDF["Ticker"].tolist()
 
 # Formats assignee names to make matching easier
 for i in range(len(companyNames)):
     companyNames[i] = companyNames[i].upper()
     if ' ' in companyNames[i]:
         # Checks if inc or corp are in the second word as they aren't always listed the same in both datasets
+        #if "INC" in companyNames[i].split()[1] or "CORP" in companyNames[i].split()[1] or "LTD" in companyNames[i].split()[1]:
         if "INC" in companyNames[i].split()[1] or "CORP" in companyNames[i].split()[1]:
             companyNames[i] = companyNames[i].split()[0]
         else:
@@ -72,11 +72,32 @@ for i in range(len(stockNames)):
     stockNames[i] = stockNames[i].upper()
     if ' ' in stockNames[i]:
         # Checks if inc or corp are in the second word as they aren't always listed the same in both datasets
+        #if "INC" in stockNames[i].split()[1] or "CORP" in stockNames[i].split()[1] or "LTD" in stockNames[i].split()[1]:
         if "INC" in stockNames[i].split()[1] or "CORP" in stockNames[i].split()[1]:
             stockNames[i] = stockNames[i].split()[0]
         else:
             stockNames[i] = stockNames[i].split()[0] + " " + stockNames[i].split()[1]
 
+
+# This reassigns the Assignee column to the new filtered company Names
+df["Assignee"] = companyNames
+# We then resort the dataframe by those Assignee names to use binary search
+df = df.sort_values(by="Assignee")
+# Then we grab those names
+companyNames = df["Assignee"].tolist()
+
+# This reassigns the Name column to the new filtered stock Names
+stocksDF["Name"] = stockNames
+# We then resort the dataframe by those Name names to use binary search
+stocksDF = stocksDF.sort_values(by="Name")
+# Then we grab those names
+stockNames = stocksDF["Name"].tolist()
+
+print(companyNames[0:10])
+print(stockNames[0:10])
+
+# Assigns the tickers list to the Ticker column in the Quotemedia ticker dataset
+tickers = stocksDF["Ticker"].tolist()
 
 print("Matching assignee names to public company names to retrieve tickers")
 # Gets the tickers of the companies from the new stocksDF

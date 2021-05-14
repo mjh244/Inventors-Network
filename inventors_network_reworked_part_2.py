@@ -6,6 +6,7 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+from sklearn import preprocessing
 
 # Reads in dataframe with stock prices
 df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices.csv')
@@ -138,6 +139,11 @@ for col in df.keys():
   or (col == 'Month After Application Date')):
     df[col] = pd.Categorical(df[col], ordered=True).codes
     pd.to_numeric(df[col], downcast='float')
+
+df = df.to_numpy()
+normalization = preprocessing.MinMaxScaler()
+min_max_df = normalization.fit_transform(df)
+df = pd.DataFrame(min_max_df)
 
 # Drops price a month after because we dont want to train on that
 df = df.drop(['Price a Month After'], axis=1)

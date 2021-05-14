@@ -17,7 +17,7 @@ from sklearn.model_selection import validation_curve
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RandomizedSearchCV
 from pandas import read_csv
-from seaborn import scatterplot
+#from seaborn import scatterplot
 from matplotlib import pyplot as plt
 
 # Initializes  lists to store features and labels
