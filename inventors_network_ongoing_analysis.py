@@ -176,5 +176,5 @@ for mean, stdev, param in zip(means, stds, params):
     print(f'mean={mean:.4}, std={stdev:.4} using {param}')
 
 
-# for ANN best params are batch_size = 128, epochs = 60, kernal_initializer='glorot_uniform'
+# for ANN best params are batch_size = 128, epochs = 60, kernal_initializer='glorot_uniform', internal nodes=6
 
