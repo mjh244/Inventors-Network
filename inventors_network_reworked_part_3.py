@@ -53,38 +53,15 @@ with open('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.c
         features.append(line[0:16]+line[17:20])
         labels.append(line[16])
         '''
-dataset = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality.csv')
-#X = dataset.iloc[:, [1:10], [11:18], [20:23]].values
+new_df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv')
 
-
-# Turns the dataframe to numbers
-for col in dataset.keys():
-  if ((col == 'Firstname') or (col == 'Lastname') or (col == 'City') or (col == 'State') or (col == 'Country')
-  or (col == 'Zipcode') or (col == 'Patent') or (col == 'AppYear') or (col == 'GYear')  or (col == 'Assignee')
-  or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')
-  or (col == 'Month After Application Date')):
-    dataset[col] = pd.Categorical(dataset[col], ordered=True).codes
-    pd.to_numeric(dataset[col], downcast='float')
-
-dropped_change = dataset.drop(columns="Change")
-dropped_AppDate = dropped_change.drop(columns="AppDate")
-dropped_price_month_after = dropped_AppDate.drop(columns="Price a Month After")
-
-
-new_df = dropped_price_month_after.to_numpy()
-sc = StandardScaler()
-# Normalizes the dataframe
-
-standard_scaler_df = sc.fit_transform(new_df)
-new_df = pd.DataFrame(standard_scaler_df)
-new_df["Change"]=dataset["Change"]
 
 # Saves the dataframe with values converted to numbers to be used in ML
 #new_df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv', index=False)
 print("Dataset with values converted to numbers")
 print(new_df)
-features = new_df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]].values
-labels = new_df.iloc[:, 20].values
+features = new_df.iloc[:, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]].values
+labels = new_df.iloc[:, 19].values
 features = np.asarray(features)
 features = features.astype(np.float64)
 labels = np.asarray(labels)
