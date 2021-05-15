@@ -6,7 +6,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-from sklearn import preprocessing
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 # Reads in dataframe with stock prices
 df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices.csv')
@@ -33,14 +34,15 @@ num_comp = set(num_comp)
 print("Number of unique companies", len(num_comp))
 
 # Computes the change col for labels in ML
-# Shows whether price incrased or decreased from app date to month after
+# Shows whether price increased or decreased from app date to month after
+# This is added to the dataframe at the end.
 change = [next_month-current_month > 0]
 change = np.array(change)
 change = change.astype(int)
 print(change[0])
 
 # Adds the change col to the df
-df["Change"] = change[0]
+#df["Change"] = change[0]
 
 #####################################
 # Network Creation
@@ -108,6 +110,11 @@ df['Eigenvector'] = eigenvectorPerInventor
 # Drops rows with empty fields and saves the df
 df = df.dropna()
 
+# Drops price a month after because we dont want to train on that
+df = df.drop(['Price a Month After'], axis=1)
+# Drops app date because we made a standardized date of the one they give
+df = df.drop(['AppDate'], axis=1)
+
 print("Dataframe with metrics")
 print(df)
 df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality.csv')
@@ -117,7 +124,7 @@ allNodesByCompany = list(inventorNetwork.nodes)
 
 # Sets node limit for subset network
 nodeNames = []
-nodeSubsetLimit = 10
+nodeSubsetLimit = 8
 for i in range(nodeSubsetLimit):
     nodeNames.append(allNodesByCompany[i])
 
@@ -126,7 +133,7 @@ inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
 
 
 # Displays the subset graph
-nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=100)
+nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=10)
 plt.title("Inventors Network (Subset)")
 plt.show()
 
@@ -134,21 +141,21 @@ plt.show()
 # Turns features to numbers
 for col in df.keys():
   if ((col == 'Firstname') or (col == 'Lastname') or (col == 'City') or (col == 'State') or (col == 'Country') 
-  or (col == 'Zipcode') or (col == 'Patent') or (col == 'AppYear') or (col == 'GYear') or (col == 'AppDate') 
-  or (col == 'Assignee') or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')
+  or (col == 'Zipcode') or (col == 'Patent') or (col == 'AppYear') or (col == 'GYear')  or (col == 'Assignee') 
+  or (col == 'Tickers') or (col == 'Month Before Application Date') or (col == 'Application Date')
   or (col == 'Month After Application Date')):
     df[col] = pd.Categorical(df[col], ordered=True).codes
-    pd.to_numeric(df[col], downcast='float')
+    df[col] = pd.to_numeric(df[col], downcast='float')
 
-df = df.to_numpy()
-normalization = preprocessing.MinMaxScaler()
-min_max_df = normalization.fit_transform(df)
-df = pd.DataFrame(min_max_df)
+print(df)
 
-# Drops price a month after because we dont want to train on that
-df = df.drop(['Price a Month After'], axis=1)
-# Drops app date because we made a standardized date of the one they give
-df = df.drop(['AppDate'], axis=1)
+# This applies standard scaling that data
+scaled_df = StandardScaler().fit_transform(df)
+df = pd.DataFrame(scaled_df)
+
+# We now add the change column which indicates whether the stock increased or decreased in price.
+df["Change"] = change[0]
+df["Change"] = pd.to_numeric(df["Change"], downcast='float')
 
 # Saves the dataframe with values converted to numbers to be used in ML
 df.to_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv', index=False)
