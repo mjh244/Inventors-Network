@@ -24,33 +24,24 @@ from matplotlib import pyplot as plt
 features = []
 labels = []
 
-with open('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv','r') as file:
-  for line in csv.reader(file):
-      #print(len(line))
-      if (line[0] != "Firstname"):
-        features.append(line[0:16] +line[17:20])
-        labels.append(line[16])
+new_df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality-to-numbers.csv')
 
-# Prints out length of entries and some lables
-#print(len(features))
-#print(features[0])
-#print(labels[0:25])
+features = new_df.iloc[:, 0:19].values
+labels = new_df.iloc[:, 19].values
+centrality_features = new_df.iloc[:, 16:19].values
 
-# Turns features and labels to floats to perform ML
-features = np.asarray(features)
-features = features.astype(np.float64)
-labels = np.asarray(labels)
-labels = labels.astype(np.float64)
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
+centrality_features_train, centrality_features_test, centrality_labels_train, centrality_labels_test = train_test_split(
+    centrality_features, labels, test_size=0.2)
 
-param_dist = {'min_samples_split': np.arange(6,9)}
-model = RandomForestClassifier(n_estimators = 100, bootstrap= False, min_samples_leaf = 7, max_depth = 7, max_features= 'sqrt')
+param_dist = {'min_samples_split': np.arange(2,11),
+              'min_samples_leaf': np.arange(2, 11)}
+model = RandomForestClassifier(n_estimators = 20, max_depth = 7, max_features = 'sqrt', bootstrap = False, n_jobs= -1, random_state= 0)
 #model = GradientBoostingClassifier(n_estimators=20, learning_rate=1, max_features=2, max_depth=2, random_state=0)
 #model = SVC(kernel="linear")
 #model = GaussianNB()
 
-"""
-cv = GridSearchCV(model, param_grid= param_dist, cv=5, scoring="accuracy")
+cv = GridSearchCV(model, param_grid = param_dist, scoring="accuracy", n_jobs= -1)
 cv.fit(features_train, labels_train)
 print("results from grid search")
 print("The best estimator across ALL searched params:\n",cv.best_estimator_)
@@ -63,7 +54,7 @@ para_range = np.arange(4, 11)
 model.fit(features_train, labels_train)
 prediction = model.predict(features_test)
 print(accuracy_score(labels_test, prediction))
-
+"""
 
 """
 train_scores, validation_scores = validation_curve(model, X=features, y=labels, param_name="min_samples_leaf",
