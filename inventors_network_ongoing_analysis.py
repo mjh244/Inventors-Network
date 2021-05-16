@@ -128,8 +128,11 @@ plt.show()
 print("finished validation analysis for SVM")
 
 # random forest analysis
-classifierRF = RandomForestClassifier(random_state=0)
-
+classifierRF = RandomForestClassifier(n_estimators = 100, max_depth = 3, max_features = 4, bootstrap = False, n_jobs= -1, random_state= 0)
+classifierRF.fit(features_train, labels_train)
+rf_predictions = classifierRF.predict(features_test)
+print()
+"""
 n_estimators = [10, 50, 100]
 criterion = ["Gini", "entropy"]
 max_depth = np.arange(1,10)
@@ -155,7 +158,7 @@ stds = grid_result.cv_results_['std_test_score']
 params = grid_result.cv_results_['params']
 for mean, stdev, param in zip(means, stds, params):
     print(f'mean={mean:.4}, std={stdev:.4} using {param}')
-
+"""
 
 # gradient boosting analysis
 classifierGB = GradientBoostingClassifier(random_state=0)
