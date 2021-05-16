@@ -29,6 +29,7 @@ new_df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality-t
 features = new_df.iloc[:, 0:19].values
 labels = new_df.iloc[:, 19].values
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
+
 # K Nearest Neighbours model
 
 classifierKNN = KNeighborsClassifier()
@@ -132,7 +133,7 @@ classifierRF = RandomForestClassifier(n_estimators = 100, max_depth = 3, max_fea
 classifierRF.fit(features_train, labels_train)
 rf_predictions = classifierRF.predict(features_test)
 print(accuracy_score(labels_test, rf_predictions))
-"""
+
 n_estimators = [10, 50, 100]
 criterion = ["Gini", "entropy"]
 max_depth = np.arange(1,10)
@@ -158,7 +159,7 @@ stds = grid_result.cv_results_['std_test_score']
 params = grid_result.cv_results_['params']
 for mean, stdev, param in zip(means, stds, params):
     print(f'mean={mean:.4}, std={stdev:.4} using {param}')
-"""
+
 
 # gradient boosting analysis
 classifierGB = GradientBoostingClassifier(random_state=0)

@@ -97,7 +97,7 @@ params = classifierTree.get_params()
 print(params)
 
 
-'''
+
 para_range = np.arange(1,20)
 train_scores, validation_scores = validation_curve(classifierTree, X=features, y=labels, param_name="max_depth",
                                                    param_range=para_range, scoring="accuracy")
@@ -119,9 +119,9 @@ plt.legend(loc = 'best')
 plt.savefig('figures/Validation_scores_for_tree.png')
 plt.show()
 print("finished validation analysis for tree")
-'''
+
 # it seems that the optimal max depth is 7.5
-'''
+
 criterion = ["gini", "entropy"]
 splitter = ["best", "random"]
 max_depth = [7,8]
@@ -139,9 +139,9 @@ params = grid_result.cv_results_['params']
 for mean, stdev, param in zip(means, stds, params):
     print(f'mean={mean:.4}, std={stdev:.4} using {param}')
 # Initializes accuracy values
-'''
 
-'''
+
+
 dt_acc_arr = []
 dt_valid_acc_arr = []
 dt_prec_arr = []
@@ -192,7 +192,7 @@ plt.legend(["Accuracy scores", "Recall scores", "Precision scores", "Cross Valid
 plt.title("Classification metrics as a function of tree depth")
 plt.savefig('figures/metrics_vs_tree_depth.png')
 plt.show()
-'''
+
 
 
 
