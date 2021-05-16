@@ -45,23 +45,34 @@ print(new_df)
 
 features = new_df.iloc[:, 0:19].values
 labels = new_df.iloc[:, 19].values
+centrality_features = new_df.iloc[:, 16:19].values
+
 
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
+centrality_features_train, centrality_features_test, centrality_labels_train, centrality_labels_test = train_test_split(
+    centrality_features, labels, test_size=0.2)
 #analysis on tree depth
 
 print("params")
 classifierTree = tree.DecisionTreeClassifier()
-'''
+
 optimized_classifierTree = tree.DecisionTreeClassifier(splitter='best', max_features='auto', max_depth=8, criterion='gini')
-classifier_history = optimized_classifierTree.fit(features_train, labels_train)
-y_pred = classifier_history.predict(features_test)
-cm = confusion_matrix(labels_test, y_pred)
+centrality_history = optimized_classifierTree.fit(centrality_features_train, labels_train)
+#classifier_history = optimized_classifierTree.fit(features_train, labels_train)
+#y_pred = classifier_history.predict(features_test)
+y_pred_centrality = centrality_history.predict(centrality_features_test)
+#cm = confusion_matrix(labels_test, y_pred)
+centrality_acc = accuracy_score(centrality_labels_test, y_pred_centrality)
+print("centrality accuracy is " + str(centrality_acc))
+cm_centrality = confusion_matrix(centrality_labels_test, y_pred_centrality)
 sn.set(font_scale=1.4) # for label size
-sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
+#sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
+sn.heatmap(cm_centrality, annot=True, annot_kws={"size": 16}) # font size
 
 plt.show()
-plt.savefig('figures/confusion_matrix_for_optimized_DTREE')
-'''
+#plt.savefig('figures/confusion_matrix_for_optimized_DTREE')
+plt.savefig('figures/confusion_matrix_for_optimized_DTREE_using_only_centrality_measures')
+
 params = classifierTree.get_params()
 print(params)
 
@@ -110,7 +121,7 @@ for mean, stdev, param in zip(means, stds, params):
 # Initializes accuracy values
 '''
 
-
+'''
 dt_acc_arr = []
 dt_valid_acc_arr = []
 dt_prec_arr = []
@@ -161,7 +172,7 @@ plt.legend(["Accuracy scores", "Recall scores", "Precision scores", "Cross Valid
 plt.title("Classification metrics as a function of tree depth")
 plt.savefig('figures/metrics_vs_tree_depth.png')
 plt.show()
-
+'''
 
 
 
