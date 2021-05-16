@@ -131,7 +131,7 @@ print("finished validation analysis for SVM")
 classifierRF = RandomForestClassifier(n_estimators = 100, max_depth = 3, max_features = 4, bootstrap = False, n_jobs= -1, random_state= 0)
 classifierRF.fit(features_train, labels_train)
 rf_predictions = classifierRF.predict(features_test)
-print()
+print(accuracy_score(labels_test, rf_predictions))
 """
 n_estimators = [10, 50, 100]
 criterion = ["Gini", "entropy"]
