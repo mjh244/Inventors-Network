@@ -57,21 +57,41 @@ print("params")
 classifierTree = tree.DecisionTreeClassifier()
 
 optimized_classifierTree = tree.DecisionTreeClassifier(splitter='best', max_features='auto', max_depth=8, criterion='gini')
-centrality_history = optimized_classifierTree.fit(centrality_features_train, labels_train)
-#classifier_history = optimized_classifierTree.fit(features_train, labels_train)
-#y_pred = classifier_history.predict(features_test)
+centrality_history = optimized_classifierTree.fit(centrality_features_train, centrality_labels_train)
+
 y_pred_centrality = centrality_history.predict(centrality_features_test)
-#cm = confusion_matrix(labels_test, y_pred)
 centrality_acc = accuracy_score(centrality_labels_test, y_pred_centrality)
 print("centrality accuracy is " + str(centrality_acc))
+centrality_rec = recall_score(centrality_labels_test, y_pred_centrality)
+print("centrality recall is " + str(centrality_rec))
+# centrality accuracy is 0.5415861314634183
+#centrality recall is 0.9969713732540451
 cm_centrality = confusion_matrix(centrality_labels_test, y_pred_centrality)
 sn.set(font_scale=1.4) # for label size
-#sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
 sn.heatmap(cm_centrality, annot=True, annot_kws={"size": 16}) # font size
-
 plt.show()
-#plt.savefig('figures/confusion_matrix_for_optimized_DTREE')
 plt.savefig('figures/confusion_matrix_for_optimized_DTREE_using_only_centrality_measures')
+
+classifier_history = optimized_classifierTree.fit(features_train, labels_train)
+y_pred = classifier_history.predict(features_test)
+dTree_acc = accuracy_score(labels_test, y_pred)
+dTree_rec = recall_score(labels_test, y_pred)
+print("accuracy of dtree is " + str(dTree_acc))
+print("recall of dtree is " + str(dTree_rec))
+#accuracy of dtree is 0.6429930627350504
+#recall of dtree is 0.8167433353655157
+cm = confusion_matrix(labels_test, y_pred)
+sn.set(font_scale=1.4) # for label size
+sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
+plt.show()
+plt.savefig('figures/confusion_matrix_for_optimized_DTREE')
+
+
+
+
+
+
+
 
 params = classifierTree.get_params()
 print(params)
