@@ -30,6 +30,14 @@ features = new_df.iloc[:, 0:19].values
 labels = new_df.iloc[:, 19].values
 centrality_features = new_df.iloc[:, 16:19].values
 
+<<<<<<< Updated upstream
+=======
+# Turns features and labels to floats to perform ML
+features = np.asarray(features)
+#features = features.astype(np.float64)
+labels = np.asarray(labels)
+#labels = labels.astype(np.float64)
+>>>>>>> Stashed changes
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size=0.2)
 centrality_features_train, centrality_features_test, centrality_labels_train, centrality_labels_test = train_test_split(
     centrality_features, labels, test_size=0.2)
