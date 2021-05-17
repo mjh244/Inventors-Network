@@ -41,8 +41,6 @@ change = np.array(change)
 change = change.astype(int)
 print(change[0])
 
-# Adds the change col to the df
-#df["Change"] = change[0]
 
 #####################################
 # Network Creation
@@ -136,6 +134,7 @@ inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
 nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=10)
 plt.title("Inventors Network (Subset)")
 plt.show()
+plt.savefig('figures/inventor_network_subset')
 
 
 # Turns features to numbers
