@@ -245,4 +245,4 @@ sn.set(font_scale=1.4) # for label size
 sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
 
 plt.show()
-plt.savefig('figures/confusion_matrix_for_optimized_ANN')
+plt.savefig('figures/confusion_matrix_for_optimized_ANN.png')

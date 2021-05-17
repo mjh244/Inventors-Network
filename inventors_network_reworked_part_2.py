@@ -134,7 +134,7 @@ inventorNetworkSubset = inventorNetwork.subgraph(nodeNames)
 nx.draw_networkx(inventorNetworkSubset, with_labels=True, font_size=10, node_size=10)
 plt.title("Inventors Network (Subset)")
 plt.show()
-plt.savefig('figures/inventor_network_subset')
+plt.savefig('figures/inventor_network_subset.png')
 
 
 # Turns features to numbers

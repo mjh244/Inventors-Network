@@ -70,7 +70,7 @@ cm_centrality = confusion_matrix(centrality_labels_test, y_pred_centrality)
 sn.set(font_scale=1.4) # for label size
 sn.heatmap(cm_centrality, annot=True, annot_kws={"size": 16}) # font size
 plt.show()
-plt.savefig('figures/confusion_matrix_for_optimized_DTREE_using_only_centrality_measures')
+plt.savefig('figures/confusion_matrix_for_optimized_DTREE_using_only_centrality_measures.png')
 
 classifier_history = optimized_classifierTree.fit(features_train, labels_train)
 y_pred = classifier_history.predict(features_test)
@@ -84,7 +84,7 @@ cm = confusion_matrix(labels_test, y_pred)
 sn.set(font_scale=1.4) # for label size
 sn.heatmap(cm, annot=True, annot_kws={"size": 16}) # font size
 plt.show()
-plt.savefig('figures/confusion_matrix_for_optimized_DTREE')
+plt.savefig('figures/confusion_matrix_for_optimized_DTREE.png')
 
 
 
