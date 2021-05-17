@@ -18,54 +18,11 @@ new_df = pd.read_csv('datasets/inventor-patent-tickers-dates-prices-centrality-t
 print("Dataset with values converted to numbers")
 print(new_df)
 
-#X = new_df.iloc[:, ["Firstname","Lastname","City","State","Country","Zipcode","Patent","AppYear","GYear","Assignee",
-                    #"Tickers","Month Before Application Date","Application Date","Month After Application Date",
-                    #"Price a Month Before","Price the Day of","Degree","Betweenness","Eigenvector"]].values
-X = new_df.iloc[:, 0:19].values
-#X = dataset.iloc[:, [13,14,15,16,17,20,21,22]].values
-#X = new_df.iloc[:, [0,1,3,4,5]].values
-#y = new_df.iloc[:, 2].values
-#y = new_df.iloc[:, "Change"].values
-y= new_df.iloc[:, 19].values
-# Encoding categorical data
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.compose import ColumnTransformer
 
-'''
-labelencoder_X_0 = LabelEncoder()
-X[:, 0] = labelencoder_X_0.fit_transform(X[:, 0])
-labelencoder_X_1 = LabelEncoder()
-X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
-labelencoder_X_2 = LabelEncoder()
-X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
-labelencoder_X_3 = LabelEncoder()
-X[:, 3] = labelencoder_X_3.fit_transform(X[:, 3])
-labelencoder_X_4 = LabelEncoder()
-X[:, 4] = labelencoder_X_4.fit_transform(X[:, 4])
-labelencoder_X_5 = LabelEncoder()
-X[:, 5] = labelencoder_X_5.fit_transform(X[:, 5])
-labelencoder_X_6 = LabelEncoder()
-X[:, 6] = labelencoder_X_6.fit_transform(X[:, 6])
-labelencoder_X_7 = LabelEncoder()
-X[:, 7] = labelencoder_X_7.fit_transform(X[:, 7])
-labelencoder_X_8 = LabelEncoder()
-X[:, 8] = labelencoder_X_8.fit_transform(X[:, 8])
-labelencoder_X_9 = LabelEncoder()
-X[:, 9] = labelencoder_X_9.fit_transform(X[:, 9])
-labelencoder_X_10 = LabelEncoder()
-X[:, 10] = labelencoder_X_10.fit_transform(X[:, 10])
-labelencoder_X_11 = LabelEncoder()
-X[:, 11] = labelencoder_X_11.fit_transform(X[:, 11])
-labelencoder_X_12 = LabelEncoder()
-X[:, 12] = labelencoder_X_12.fit_transform(X[:, 12])
-labelencoder_X_13 = LabelEncoder()
-X[:, 13] = labelencoder_X_13.fit_transform(X[:, 13])
-'''
-#onehotencoder = OneHotEncoder(categorical_features = [1])
-#onehotencoder = OneHotEncoder(categories='auto')
-#X = onehotencoder.fit_transform(X).toarray()
-#removing the dummy variable
-#X = X[:, 1:]
+X = new_df.iloc[:, 0:19].values
+
+y= new_df.iloc[:, 19].values
+
 
 print("start ANN")
 print("X is" + str(X))
@@ -132,27 +89,18 @@ def create_classifier2(optimizer='adam', init='glorot_uniform'):
 seed = 7
 np.random.seed(seed)
 # analysis on ANN
-#batch_size = 128
-#epochs = 10
-# hyperparameter tuning comes from https://towardsdatascience.com/simple-guide-to-hyperparameter-tuning-in-neural-networks-3fe03dad8594
-#model_CV = KerasClassifier(build_fn=create_classifier, epochs=epochs,
-                           #batch_size=batch_size, verbose=1)
-'''
+
+
 model_init_epochs_batch_CV = KerasClassifier(build_fn=create_classifier2, verbose=1)
 
 init_mode = ['glorot_uniform', 'glorot_normal']
 batches = [68, 128, 256, 512]
 epochs = [10, 20, 30, 40, 50, 60]
-# define the grid search parameters
-#init_mode = ['uniform', 'lecun_uniform', 'normal', 'zero',
-             #'glorot_normal', 'glorot_uniform', 'he_normal', 'he_uniform']
+
 
 param_grid = dict(epochs=epochs, batch_size=batches, init=init_mode)
 
-#grid = GridSearchCV(estimator=model_init_epochs_batch_CV,
-                    #param_grid=param_grid,
-                    #cv=3)
-#less accurate but faster
+
 grid = RandomizedSearchCV(estimator=model_init_epochs_batch_CV,
                     param_distributions=param_grid,
                     cv=3)
@@ -238,7 +186,7 @@ plt.tight_layout()
 plt.legend(loc = 'best')
 plt.savefig('figures/Validation_curve_for_ANN.png')
 plt.show()
-'''
+
 # plotting of graphs for best params determined by RandomizedSearchcv
 
 classifier = keras.Sequential()
@@ -261,7 +209,7 @@ classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc']
 classifier_history = classifier.fit(X_train, y_train, batch_size = 128, epochs = 60, validation_data=(X_test, y_test))
 y_pred = classifier.predict(X_test)
 y_pred = (y_pred > 0.5)
-# plotting code comes from https://towardsdatascience.com/simple-guide-to-hyperparameter-tuning-in-neural-networks-3fe03dad8594
+
 # Plot the loss function
 plt.ylabel(r'Loss')
 plt.xlabel(r'Epoch')
@@ -281,11 +229,10 @@ plt.show()
 plt.ylabel(r'Accuracy')
 plt.xlabel(r'Epoch')
 plt.title("Accuracy Function for Optimized ANN")
-#fig, ax = plt.subplots(1, 1, figsize=(10,6))
+
 plt.plot(classifier_history.history['acc'], 'r', label='train')
 plt.plot(classifier_history.history['val_acc'], 'b' ,label='val')
-#plt.xlabel(r'Epoch')
-#plt.ylabel(r'Accuracy')
+
 plt.legend(loc = 'best')
 plt.savefig('figures/Accuracy_function_for_optimized_ANN.png')
 plt.show()
